@@ -1,0 +1,21 @@
+let
+    out = (folder_name as text, file_name as text) as table =>
+    let
+        sPath = Text.Combine({folder_name, "\", file_name}),
+        Source = Csv.Document(
+                File.Contents(sPath),
+                [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]
+                ),
+        #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"Column5", type text}}),
+        #"Removed Top Rows" = Table.Skip(#"Changed Type",2),
+        #"Promoted Headers" = Table.PromoteHeaders(#"Removed Top Rows", [PromoteAllScalars=true]),
+        #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"年/Year", Int64.Type}, {"月/Month", Int64.Type}, {"日/Day", Int64.Type}, {"數值/Value", type text}, {"數據完整性/data Completeness", type text}}),
+        #"Renamed Columns" = Table.RenameColumns(#"Changed Type1",{{"年/Year", "Year"}, {"月/Month", "Month"}, {"日/Day", "Day"}, {"數值/Value", "Value"}, {"數據完整性/data Completeness", "DataCompleteness"}}),
+        #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns","***","",Replacer.ReplaceText,{"Value"}),
+        #"Changed Type2" = Table.TransformColumnTypes(#"Replaced Value",{{"Value", type number}}),
+        #"Removed Errors" = Table.RemoveRowsWithErrors(#"Changed Type2", {"Year"}),
+        #"Removed Errors1" = Table.RemoveRowsWithErrors(#"Removed Errors")
+    in
+        #"Removed Errors1"
+in
+    out
