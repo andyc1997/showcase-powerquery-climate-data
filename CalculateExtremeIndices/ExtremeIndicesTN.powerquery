@@ -1,0 +1,10 @@
+let
+    Source = Excel.CurrentWorkbook(){[Name="LaggedData_MinTemp"]}[Content],
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Year", Int64.Type}, {"Month", Int64.Type}, {"Day", Int64.Type}, {"MinTemp", type number}, {"Lag_b2", type number}, {"Lag_b1", type number}, {"Lag_0", type number}, {"Lag_1", type number}, {"Lag_2", type number}}),
+    #"Filtered Rows" = Table.SelectRows(#"Changed Type", each ([Lag_b2] <> null) and ([Lag_2] <> null) and ([Year] >= 1971) and ([Year] <= 2000)),
+    #"Removed Columns" = Table.RemoveColumns(#"Filtered Rows",{"Year", "MinTemp"}),
+    #"Unpivoted Columns" = Table.UnpivotOtherColumns(#"Removed Columns", {"Month", "Day"}, "Lag", "MinTemp"),
+    #"Removed Columns1" = Table.RemoveColumns(#"Unpivoted Columns",{"Lag"}),
+    #"Grouped Rows" = Table.Group(#"Removed Columns1", {"Month", "Day"}, {{"TN90", each List.Percentile([MinTemp], 0.9), type number}, {"TN10", each List.Percentile([MinTemp], 0.1), type number}})
+in
+    #"Grouped Rows"
