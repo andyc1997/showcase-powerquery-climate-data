@@ -1,0 +1,5 @@
+let
+    Source = Table.NestedJoin(ExtremeIndicesTN, {"Month", "Day"}, ExtremeIndicesTX, {"Month", "Day"}, "ExtremeIndicesTX", JoinKind.Inner),
+    #"Expanded ExtremeIndicesTX" = Table.ExpandTableColumn(Source, "ExtremeIndicesTX", {"TX90", "TX10"}, {"TX90", "TX10"})
+in
+    #"Expanded ExtremeIndicesTX"
