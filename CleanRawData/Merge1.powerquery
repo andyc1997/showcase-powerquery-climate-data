@@ -1,6 +1,6 @@
 let 
     list_headers = {"Year", "Month", "Day"},
-    folder_name = "G:\My Drive\RESEARCH\Physics\EnergyScience\climatic influences on energy consumption in hong kong_hko2010\data",
+    folder_name = "G:\data",
     table_climtemp = DataCleaning_TempSeries(folder_name, "CLMTEMP_HKO_.csv"),
     table_climmax = DataCleaning_TempSeries(folder_name, "CLMMAXT_HKO_.csv"),
     table_climmin = DataCleaning_TempSeries(folder_name, "CLMMINT_HKO_.csv"),
