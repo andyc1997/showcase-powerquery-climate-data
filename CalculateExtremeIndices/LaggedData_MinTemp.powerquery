@@ -1,0 +1,6 @@
+let
+    Source = Excel.CurrentWorkbook(){[Name="Merge1"]}[Content],
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Year", Int64.Type}, {"Month", Int64.Type}, {"Day", Int64.Type}, {"DataCompleteness", type text}, {"MeanTemp", type number}, {"MaxTemp", type number}, {"MinTemp", type number}, {"Season", type text}, {"HDD", type number}, {"CDD", type number}}),
+    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type",{"Year", "Month", "Day", "MinTemp"})
+in
+    #"Removed Other Columns"
