@@ -1,0 +1,24 @@
+let 
+    list_headers = {"Year", "Month", "Day"},
+    folder_name = "G:\My Drive\RESEARCH\Physics\EnergyScience\climatic influences on energy consumption in hong kong_hko2010\data",
+    table_climtemp = DataCleaning_TempSeries(folder_name, "CLMTEMP_HKO_.csv"),
+    table_climmax = DataCleaning_TempSeries(folder_name, "CLMMAXT_HKO_.csv"),
+    table_climmin = DataCleaning_TempSeries(folder_name, "CLMMINT_HKO_.csv"),
+    table_merged = Table.NestedJoin(
+        Table.NestedJoin(table_climtemp, list_headers, table_climmax, list_headers, "table_climmax", JoinKind.Inner),
+        list_headers, table_climmin, list_headers, "table_climmin", JoinKind.Inner),
+    table_full = Table.ExpandTableColumn(
+        Table.ExpandTableColumn(table_merged, "table_climmax", {"Value"}, {"table_climmax.Value"}),
+        "table_climmin", {"Value"}, {"table_climmin.Value"}),
+    table_after1885 = Table.SelectRows(table_full, each [Year]>=1885),
+    #"Reordered Columns" = Table.ReorderColumns(table_after1885,{"Year", "Month", "Day", "DataCompleteness", "Value", "table_climmax.Value", "table_climmin.Value"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Reordered Columns",{{"Value", "MeanTemp"}, {"table_climmax.Value", "MaxTemp"}, {"table_climmin.Value", "MinTemp"}}),
+    #"Invoked Custom Function" = Table.AddColumn(
+        Table.AddColumn(
+            Table.AddColumn(#"Renamed Columns", 
+                "Season", each DefineSeasonByPaper([Month])
+            ), 
+            "HDD", each DegreeDays([MeanTemp], "HDD")),
+        "CDD", each DegreeDays([MeanTemp], "CDD"))
+in 
+    #"Invoked Custom Function"
