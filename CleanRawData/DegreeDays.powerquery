@@ -1,0 +1,7 @@
+let
+    out = (temp as number, degday_type as text) as number =>
+    if degday_type = "CDD" then List.Max({temp - 26, 0})
+    else if degday_type = "HDD" then List.Max({18 - temp, 0}) 
+    else Number.NaN
+in
+    out
